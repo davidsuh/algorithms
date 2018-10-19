@@ -18,17 +18,19 @@ public class Percolation {
         }
         this.n = n;
         int size = n * n;
-        this.grid = new WeightedQuickUnionUF(size);
+        // initialize grid with size + 2 sites. 2 extra sites to represent top & bottom
+        this.grid = new WeightedQuickUnionUF(size + 2);
         this.open = new int[size];
 
-        // connect top row to site n
-        // connect bottom row to site n + 1
+        // connect top row to site size
+        // connect bottom row to site size + 1
         for (int i = 0; i < n; i++) {
             this.grid.union(i, size);
             this.grid.union(size - i - 1, size + 1);
         }
     }
 
+    // returns flattened n value of (row, col) grid
     private int rowColtoN(int row, int col) {
         return 3 * (row - 1) + (col - 1);
     }
@@ -79,7 +81,7 @@ public class Percolation {
         joinNeighbors(row, col, site);
     }
 
-    // // is site (row, col) open?
+    // is site (row, col) open?
     public boolean isOpen(int row, int col) {
         if (!isValidSite(row, col)) {
             throw new java.lang.IllegalArgumentException("row and col out of bounds");
@@ -94,7 +96,8 @@ public class Percolation {
             throw new java.lang.IllegalArgumentException("row and col out of bounds");
         }
         int site = rowColtoN(row, col);
-        return this.grid.connected(site, this.n);
+        int top = this.n * this.n;
+        return this.grid.connected(site, top);
     }
 
     // number of open sites
@@ -108,7 +111,9 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return this.grid.connected(this.n, this.n + 1);
+        int top = this.n * this.n;
+        int bottom = top + 1;
+        return this.grid.connected(top, bottom);
     }
 
     // test client (optional)
